@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
-  const [vote, setVote] = useState(null);
+ // const [vote, setVote] = useState(null);
   const [result, setResult] = useState(null);
 
   const handleVote = async (candidate) => {
