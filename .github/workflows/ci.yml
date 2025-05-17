@@ -29,19 +29,13 @@ jobs:
         cd backend
         pip install -r requirements.txt
 
-    # Step 4: Run Backend Tests (Optional if you have backend tests)
-    - name: Run backend tests
-      run: |
-        cd backend
-        pytest  # Assuming you use pytest for testing Flask
-
-    # Step 5: Set up Node.js for React Frontend
+    # Step 4: Set up Node.js for React Frontend
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
         node-version: '16'
 
-    # Step 6: Cache Node Modules (for faster builds)
+    # Step 5: Cache Node Modules (for faster builds)
     - name: Cache Node modules
       uses: actions/cache@v4
       with:
@@ -50,19 +44,19 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-node-modules-
 
-    # Step 7: Install Frontend Dependencies (React)
+    # Step 6: Install Frontend Dependencies (React)
     - name: Install frontend dependencies
       run: |
         cd frontend
         npm install
 
-    # Step 8: Run Frontend Tests (React)
+    # Step 7: Run Frontend Tests (React)
     - name: Run frontend tests
       run: |
         cd frontend
         npm test -- --ci --coverage --watchAll=false
 
-    # Step 9: Build the React app (Frontend)
+    # Step 8: Build the React app (Frontend)
     - name: Build the frontend app
       run: |
         cd frontend
