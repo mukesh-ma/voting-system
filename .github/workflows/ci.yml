@@ -1,4 +1,4 @@
-name: CI Pipeline
+name: Full Voting App CI Pipeline
 
 on:
   push:
@@ -13,26 +13,57 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Checkout the code
-    - name: Checkout code
+    # Step 1: Checkout the code
+    - name: Checkout repository
       uses: actions/checkout@v2
 
-    # Set up Node.js environment
+    # Step 2: Set up Python for Flask Backend
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'  # Or any other version compatible with your Flask app
+
+    # Step 3: Install Backend Dependencies (Flask)
+    - name: Install backend dependencies
+      run: |
+        cd backend
+        pip install -r requirements.txt
+
+    # Step 4: Run Backend Tests (Optional if you have backend tests)
+    - name: Run backend tests
+      run: |
+        cd backend
+        pytest  # Assuming you use pytest for testing Flask
+
+    # Step 5: Set up Node.js for React Frontend
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
         node-version: '16'
 
-    # Install dependencies
-    - name: Install dependencies
+    # Step 6: Cache Node Modules (for faster builds)
+    - name: Cache Node modules
+      uses: actions/cache@v2
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node-modules-${{ hashFiles('frontend/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-modules-
+
+    # Step 7: Install Frontend Dependencies (React)
+    - name: Install frontend dependencies
       run: |
+        cd frontend
         npm install
 
-    # Run the tests
-    - name: Run tests
+    # Step 8: Run Frontend Tests (React)
+    - name: Run frontend tests
       run: |
-        npm test -- --ci --coverage
+        cd frontend
+        npm test -- --ci --coverage --watchAll=false
 
-    # Build the app
-    - name: Build the app
-      run: npm run build
+    # Step 9: Build the React app (Frontend)
+    - name: Build the frontend app
+      run: |
+        cd frontend
+        npm run build
