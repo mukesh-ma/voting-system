@@ -244,10 +244,13 @@ The GitHub Actions configuration is located in `.github/workflows/ci.yml`. It wi
 ### Sample `ci.yml` file:
 
 ```yaml
-name: CI Pipeline
+name: Full Voting App CI Pipeline
 
 on:
   push:
+    branches:
+      - main
+  pull_request:
     branches:
       - main
 
@@ -256,19 +259,54 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    # Step 1: Checkout the code
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    # Step 2: Set up Python for Flask Backend
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.x'
-    - name: Install dependencies
+        python-version: '3.8'  # Or any other version compatible with your Flask app
+
+    # Step 3: Install Backend Dependencies (Flask)
+    - name: Install backend dependencies
       run: |
         cd backend
         pip install -r requirements.txt
-    - name: Run tests
+
+    # Step 4: Set up Node.js for React Frontend
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+
+    # Step 5: Cache Node Modules (for faster builds)
+    - name: Cache Node modules
+      uses: actions/cache@v4
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node-modules-${{ hashFiles('frontend/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-modules-
+
+    # Step 6: Install Frontend Dependencies (React)
+    - name: Install frontend dependencies
       run: |
-        cd backend
-        pytest
+        cd frontend
+        npm install
+
+    # Step 7: Run Frontend Tests (React)
+    - name: Run frontend tests
+      run: |
+        cd frontend
+        npm test -- --ci --coverage --watchAll=false
+
+    # Step 8: Build the React app (Frontend)
+    - name: Build the frontend app
+      run: |
+        cd frontend
+        CI=false npm run build
 ```
 
 ---
